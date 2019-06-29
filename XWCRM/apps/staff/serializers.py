@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import StaffInfo
+from department.models import Department
 import re
 
 
@@ -61,9 +62,20 @@ class RegisterModelSerializer(serializers.ModelSerializer):
         mobile = validated_data.get("mobile")
         password = validated_data.get("password")
         desc = validated_data.get("desc")
+
+        # 判断性别
         gender = validated_data.get("gender")
-        role = validated_data.get("role")
-        role_power = validated_data.get("role_power")
+        if gender == "女" or "0":
+            gender = False
+        else:
+            gender = True
+
+        role = validated_data.get("role")  # 权限等级
+        role_power = validated_data.get("role_power")   #　职位名称
+
+        # 获取部门对象
+        department_name = validated_data.get("department")
+        department = Department.objects.get(name=department_name)
 
         try:
             user = StaffInfo.objects.create(
@@ -73,7 +85,8 @@ class RegisterModelSerializer(serializers.ModelSerializer):
                 desc=desc,
                 gender=gender,
                 role=role,
-                role_power=role_power
+                role_power=role_power,
+                department=department
             )
 
             # 密码加密

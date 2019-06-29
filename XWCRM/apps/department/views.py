@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from .models import Department
 from .serializers import DepartmentModelSerializer
 from rest_framework.response import Response
+from staff.models import StaffInfo
 
 
 # Create your views here.
@@ -49,3 +50,27 @@ class DepartmentAPIView(APIView):
             dep_obj.save()
             res = dep_obj
         return Response({"result": res})
+
+
+class DepartmentSearchAPIView(APIView):
+    def get(self, request):
+        """
+        获取某个部门的所有人员
+        :return: {"一个部门":[人,人]}
+        """
+        department_name = request.query_params.get("department_name")
+        staff_list = []
+        if department_name:
+            try:
+                department = Department.objects.get(name=department_name)
+            except Department.DoesNotExist:
+                return Response({"result":"对不起,该部门不存在"})
+            queryset = StaffInfo.objects.filter(department=department).all()
+            print(queryset)
+            for i in queryset:
+                staff_list.append({
+                    "username": i.username,
+                    "department": i.department.name,
+                    "mobile": i.mobile
+                })
+        return Response({"result":staff_list})

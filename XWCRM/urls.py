@@ -29,6 +29,7 @@ xversion.register_models()
 urlpatterns = [
     path('', include("staff.urls")),
     path('department/', include("department.urls")),
+    path('customer/', include("customer.urls")),
     path('admin/', admin.site.urls),
     path(r'xadmin/', xadmin.site.urls),
 ]
